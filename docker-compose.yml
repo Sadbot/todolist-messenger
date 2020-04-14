@@ -1,0 +1,35 @@
+version: '3.1'
+
+services:
+
+  db:
+    restart: on-failure
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_MULTIPLE_DATABASES=$DB_NAME,${DB_NAME}_test
+    volumes:
+      - ./docker/pg_init_scripts/:/docker-entrypoint-initdb.d/
+      - $HOME/.docker-volumes/todolist/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:$DB_PORT
+
+  app:
+    build: .
+    restart: on-failure
+    image: todolist
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      - LOCAL_MODE=0
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - 8080:$PORT
+    command: /bin/sh -c ./entrypoint.sh
+

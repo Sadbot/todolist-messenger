@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  telegram:
+    build: .
+    restart: on-failure
+    image: todolist
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      - LOCAL_MODE=0
+    links:
+      - db
+    # !!depends_on app for bots is for migrations run!!
+    depends_on:
+      - db
+      - app
+    command: python telegram_app.py
