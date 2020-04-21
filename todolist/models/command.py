@@ -24,9 +24,6 @@ class Command(Base):
         Boolean, server_default=expression.true(), default=True,
         nullable=False
     )
-    command_group_id = Column(Integer,
-                              ForeignKey('command_group.id', name='fk_command_command_group_id_command_group_id',
-                                         onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creation_date = Column(DateTime(timezone=True), default=dt.datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), onupdate=dt.datetime.utcnow)
 
@@ -35,10 +32,10 @@ class CommandNkeywords(Base):
     id = Column(Integer, primary_key=True)
     keyword = Column(String(length=255), nullable=False)
     group = Column(Integer, nullable=False)
-    command_id = Column(Integer, ForeignKey('command.id', name='fk_command_nkeywords_command_id_command_id',
-                                            onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
-
-
-class CommandGroup(Base):
-    id = Column(Integer, primary_key=True)
-    name = Column(String(length=30))
+    command_id = Column(
+        Integer,
+        ForeignKey(
+            'command.id', name='fk_command_nkeywords_command_id_command_id',
+            onupdate='CASCADE', ondelete='CASCADE'
+        ), nullable=False
+    )

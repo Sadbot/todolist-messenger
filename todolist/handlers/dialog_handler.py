@@ -2,7 +2,7 @@
 Актуальное состояние диалога хранится в БД.
 
 Пример использования:
-    dialog = UserDialog(user_id=<user_id>, db_session=<db_session>)
+    dialog = DialogHandler(user_id=<user_id>, db_session=<db_session>)
 
     # for open new dialog
     dialog.open(command_id=<command_id>)
@@ -26,10 +26,10 @@ from typing import Any, Dict, Union
 from sqlalchemy import null
 from sqlalchemy.orm import Session
 
-from todolist.models.user import MsgUser
+from todolist.models.messenger import Dialog
 
 
-class UserDialog(dict):
+class DialogHandler(dict):
     def __init__(self, user_id: int, db_session: Session, logger: logging.Logger = None,
                  data: Union[Dict[str, Any], str] = None) -> None:
         """
@@ -49,7 +49,7 @@ class UserDialog(dict):
         self._initialize_data(data)
 
     @property
-    def _user(self) -> MsgUser:
+    def _user(self) -> Dialog:
         """Свойство для получения экземпляра пользователя из БД.
 
         Returns:
@@ -59,7 +59,7 @@ class UserDialog(dict):
             ValueError если пользователь с указанным идентификатором не найден в БД.
         """
         if self._user_info is None:
-            self._user_info = self._session.query(MsgUser).filter(MsgUser.id == self.user_id).first()
+            self._user_info = self._session.query(Dialog).filter(Dialog.id == self.user_id).first()
             if self._user_info is None:
                 raise ValueError(f'User with id {self.user_id} not found in database')
 

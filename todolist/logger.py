@@ -3,7 +3,7 @@ import logging
 from aiohttp.abc import AbstractAccessLogger
 
 logging_level_for_modules = (
-    ('pymorphy2.opencorpora_dict.wrapper', 'WARN')
+    ('pymorphy2.opencorpora_dict.wrapper', 'WARN'),
 )
 
 

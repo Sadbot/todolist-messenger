@@ -10,7 +10,6 @@ services:
       - POSTGRES_PASSWORD=$DB_PASSWORD
       - POSTGRES_MULTIPLE_DATABASES=$DB_NAME,${DB_NAME}_test
     volumes:
-      - ./docker/pg_init_scripts/:/docker-entrypoint-initdb.d/
       - $HOME/.docker-volumes/todolist/postgres:/var/lib/postgresql/data
     ports:
       - 5432:$DB_PORT

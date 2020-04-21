@@ -13,8 +13,8 @@ services:
       - LOCAL_MODE=0
     links:
       - db
-    # !!depends_on app for bots is for migrations run!!
+    # !!depends_on app is for bots is for migrations run!!
     depends_on:
       - db
       - app
-    command: python telegram_app.py
+    command: python main_telegram.py

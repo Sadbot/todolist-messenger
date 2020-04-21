@@ -6,7 +6,7 @@ from aiogram.types import ContentType
 from sqlalchemy.orm import Session
 
 from todolist.drivers.dto import RequestMessage, TELEGRAM_MESSENGER
-from todolist.handlers.common import CommonHandler
+from todolist.handlers.cammand_handler import CommandHandler
 
 
 def register_handlers(dp: Dispatcher, logger: logging.Logger):
@@ -22,7 +22,7 @@ async def default_handler(message: types.Message, db_session: Session, logger: l
     Подключение обработчика запросов общего для всех мессенджеров
     """
     request_message = hydrate_request(message)
-    response = await CommonHandler(db_session, logger).dispatch(request_message)
+    response = await CommandHandler(db_session, logger).dispatch(request_message)
 
     if response.text:
         await message.reply(response.text, parse_mode='Markdown')
@@ -37,14 +37,14 @@ def hydrate_request(message: types.Message) -> RequestMessage:
     command_name = None
     text_strip = message.text.strip()
     if text_strip.startswith('/'):
-        command_name, *_ = text_strip.partition(' ')
+        command_name, *_ = text_strip.split(' ', maxsplit=1)
         command_name = command_name.strip('/')
 
     return RequestMessage(
         user_id=message.from_user.id,
-        username=message.from_user.username,
         text=message.text,
         dialog_id=message.chat.id,
         messenger_type=TELEGRAM_MESSENGER,
-        command_name=command_name
+        command_name=command_name,
+        username=message.from_user.username,
     )

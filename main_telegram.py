@@ -19,8 +19,6 @@ def create_dispatcher():
     db_session = scoped_session(sessionmaker(bind=engine))
 
     # TODO Add db with proxies and iterate by available connections
-    # proxy = 'socks5://185.251.10.153:1080'
-    # proxy = 'socks5://50.62.35.16:38950'
     proxy = 'socks5://96.96.33.133:1080'
 
     bot = Bot(token=config.TELEGRAM_TOKEN, proxy=proxy)

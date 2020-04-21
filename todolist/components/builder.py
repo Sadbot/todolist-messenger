@@ -3,7 +3,7 @@
 
 Пример использования:
 
-handlers/common.py
+handlers/cammand_handler.py
     from todolist.components.interactive import Option
     from todolist.components.builder import InteractiveComponentsBuilder
     from todolist.drivers.dto import ResponseMessage
@@ -17,7 +17,7 @@ handlers/common.py
 
         return ResponseMessage(
             user_id=request.user_id,
-            command_name='echo',
+            command_name='help',
             text=request.text,
             photo=None,
             interactive_components: components

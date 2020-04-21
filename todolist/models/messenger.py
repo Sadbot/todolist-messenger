@@ -1,36 +1,41 @@
-import datetime as dt
+from sqlalchemy import Column, String, Integer, ForeignKey, JSON, UniqueConstraint
 
-from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime
-from sqlalchemy.sql import expression
 from todolist.models.base import Base
 
 
-class Messenger(Base):
+class MessengerType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(length=20))
 
 
-class UserMessenger(Base):
+class MsgUser(Base):
+    __table_args__ = (
+        UniqueConstraint('ext_id', 'messenger_type_id', name='_ext_id_messenger_id'),
+    )
     id = Column(Integer, primary_key=True)
+    ext_id = Column(String(length=100), nullable=False)
     user_id = Column(
-        Integer, ForeignKey('user.id', name='fk_user_messenger_user_id_user_id', ondelete='CASCADE'),
-        nullable=False
+        Integer,
+        ForeignKey(
+            'user.id', name='fk_messenger_user_user_id',
+            onupdate='CASCADE', ondelete='CASCADE'
+        )
     )
+    email = Column(String(length=100))
+    username = Column(String(length=100))
+    phone = Column(String(length=20))
+    messenger_type_id = Column(Integer, nullable=False)
+    dialog_data = Column(JSON)
 
-    msg_user_id = Column(Integer,
-                         ForeignKey(
-                             'msg_user.id', name='fk_user_messenger_msg_user_id',
-                             onupdate='CASCADE', ondelete='CASCADE'
-                         ),
-                         nullable=False)
-    is_active = Column(
-        Boolean, server_default=expression.true(), default=True,
-        nullable=False
-    )
-    is_default = Column(
-        Boolean, server_default=expression.false(), default=False,
-        nullable=False
-    )
 
-    creation_date = Column(DateTime(timezone=True), default=dt.datetime.utcnow)
-    updated_at = Column(DateTime(timezone=True), onupdate=dt.datetime.utcnow)
+class Dialog(Base):
+    id = Column(Integer, primary_key=True)
+    msg_user_id = Column(
+        Integer,
+        ForeignKey(
+            'msg_user.id', name='fk_user_messenger_msg_user_id',
+            onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    dialog_data = Column(JSON)

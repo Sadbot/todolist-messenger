@@ -1,6 +1,6 @@
 # Todolist-messenger
 
-Universal chat-bot for slack\telegram with todolist/ 
+Универсальный асинхронный чат-бот для мессенджеров.
 
 ## Project initialization
 
