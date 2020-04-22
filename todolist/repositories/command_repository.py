@@ -12,10 +12,24 @@ class CommandRepository(BaseRepository):
 
         return {command.filename.lower(): command for command in commands}
 
-    def get_users_id(self) -> List:
-        users = self.db.query(User).all()
+    def get_active(self):
+        statement = sqlalchemy.sql.text(
+            """select c.name, c.filename 
+                 from public.command c 
+                where c.is_active = true 
+             order by id"""
+        )
+        return self.db.execute(statement).fetchall()
 
-        return [user.id for user in users]
+    def find_by_name(self, command_name: str):
+        statement = sqlalchemy.sql.text(
+            """select c.name, c.filename 
+                 from public.command c 
+                where c.is_active = true
+                  and lower(c.name) LIKE :name 
+             order by id"""
+        )
+        return self.db.execute(statement, {'name': '%' + command_name + '%'}).fetchall()
 
     def get_commands_by_keywords(self, keywords: List[str]) -> sqlalchemy.engine.result.RowProxy:
         # todo пофиксить sql инъекции, хоть и слова приходят от морфера

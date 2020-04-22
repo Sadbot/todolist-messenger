@@ -7,10 +7,10 @@ from todolist.models.base import Base
 
 class Task(Base):
     id = Column(Integer, primary_key=True)
-    user_id = Column(
+    msg_user_id = Column(
         Integer,
         ForeignKey(
-            'user.id', name='fk_messenger_user_user_id',
+            'msg_user.id', name='fk_msg_user_id_msg_user_id',
             onupdate='CASCADE', ondelete='CASCADE'
         ),
         nullable=False

@@ -3,16 +3,18 @@ from typing import Any, List, Optional
 
 from sqlalchemy.orm import Session
 
-from todolist.command_files.register import register, COMMAND_NAME_EN as REGISTER_COMMAND_NAME
-from todolist.command_files.help import help
+from todolist.command_files.add_todo import add_todo
 from todolist.command_files.echo import echo
+from todolist.command_files.help import help
+from todolist.command_files.todo_list import todo_list
+from todolist.command_files.register import register, COMMAND_NAME_EN as REGISTER_COMMAND_NAME
+from todolist.components.builder import InteractiveComponentsBuilder
 from todolist.drivers.dto import RequestMessage, ResponseMessage
 from todolist.handlers.dialog_handler import DialogHandler
 from todolist.models.command import Command
 from todolist.repositories.command_repository import CommandRepository
 from todolist.repositories.user_repository import UserRepository
 from todolist.utils.morph_analyzer import MorphAnalyzer
-from todolist.components.builder import InteractiveComponentsBuilder
 
 
 class CommandHandler:
@@ -20,6 +22,8 @@ class CommandHandler:
         'help': help,
         'register': register,
         'echo': echo,
+        'todo_list': todo_list,
+        'add_todo': add_todo,
     }
 
     def __init__(self, db: Session, logger: logging.Logger = None):
@@ -57,7 +61,7 @@ class CommandHandler:
             )
 
         # если есть открытый диалог
-        user_dialog = DialogHandler(user_id=self._user.id, db_session=self.db, data=self._user.dialog_data)
+        user_dialog = DialogHandler(user=self._user, db_session=self.db, data=self._user.dialog_data)
         self.logger.debug(f'User dialog - {user_dialog}')
         if user_dialog.is_open():
             return await self._handle_open_dialog(user_dialog=user_dialog)
@@ -81,16 +85,16 @@ class CommandHandler:
         if not available_commands:
             return self._get_response(text='Команда не найдена. Введите помощь (help) для вывода доступных команд')
 
-        if len(available_commands) > 1:
-            text = ', '.join([command.name for command in available_commands])
-            components = InteractiveComponentsBuilder()
-            for command in available_commands:
-                components.add_button('run_task_name', value=command.name.lower(), text='Выполнить',
-                                      label=command.name)
+        if len(available_commands) == 1:
+            return await self._call_command(command=available_commands.pop(0), user_dialog=user_dialog)
 
-            return self._get_response(text=f'Найдено несколько команд по запросу: {text}', components=components)
+        text = ', '.join([command.name for command in available_commands])
+        components = InteractiveComponentsBuilder()
+        for command in available_commands:
+            components.add_button('run_task_name', value=command.name.lower(), text='Выполнить',
+                                  label=command.name)
 
-        return await self._call_command(command=available_commands[0], user_dialog=user_dialog)
+        return self._get_response(text=f'Найдено несколько команд по запросу: {text}', components=components)
 
     async def _call_command(self, command: Command, user_dialog: DialogHandler = None) -> ResponseMessage:
         """Вызов функции команды.
@@ -115,7 +119,8 @@ class CommandHandler:
                 request=self._request,
                 user_dialog=user_dialog,
                 command_id=command.id,
-                logger=self.logger
+                logger=self.logger,
+                user=self._user,
             )
 
         return self._get_response(text=command.response_text, command_name=command.name)

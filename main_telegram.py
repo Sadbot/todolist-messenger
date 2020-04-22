@@ -1,4 +1,4 @@
-import logging
+import os
 
 from aiogram import Bot, Dispatcher
 from aiogram.utils import executor
@@ -19,7 +19,7 @@ def create_dispatcher():
     db_session = scoped_session(sessionmaker(bind=engine))
 
     # TODO Add db with proxies and iterate by available connections
-    proxy = 'socks5://96.96.33.133:1080'
+    proxy = os.environ.get('PROXY')
 
     bot = Bot(token=config.TELEGRAM_TOKEN, proxy=proxy)
     dispatcher = Dispatcher(bot)

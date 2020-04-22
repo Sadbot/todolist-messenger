@@ -26,16 +26,3 @@ class MsgUser(Base):
     phone = Column(String(length=20))
     messenger_type_id = Column(Integer, nullable=False)
     dialog_data = Column(JSON)
-
-
-class Dialog(Base):
-    id = Column(Integer, primary_key=True)
-    msg_user_id = Column(
-        Integer,
-        ForeignKey(
-            'msg_user.id', name='fk_user_messenger_msg_user_id',
-            onupdate='CASCADE', ondelete='CASCADE'
-        ),
-        nullable=False
-    )
-    dialog_data = Column(JSON)

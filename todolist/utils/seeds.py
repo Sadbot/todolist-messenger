@@ -28,6 +28,12 @@ def make_seeds_if_empty(db_session_manager: scoped_session, logger: logging.Logg
             Command(name="Помощь", keywords1='помощь, help', keywords2='бот, команда',
                     filename='help', is_active=True
                     ),
+            Command(name="Список todo", keywords1='список, todo', keywords2='бот, команда',
+                    filename='todo_list', is_active=True
+                    ),
+            Command(name="Добавить todo", keywords1='добавить, todo', keywords2='бот, команда',
+                    filename='add_todo', is_active=True
+                    ),
         ]
         session.bulk_save_objects(objects)
         session.commit()

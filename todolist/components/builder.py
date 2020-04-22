@@ -3,7 +3,7 @@
 
 Пример использования:
 
-handlers/cammand_handler.py
+handlers/command_handler.py
     from todolist.components.interactive import Option
     from todolist.components.builder import InteractiveComponentsBuilder
     from todolist.drivers.dto import ResponseMessage
@@ -16,7 +16,7 @@ handlers/cammand_handler.py
         components = InteractiveComponentsBuilder().add_checkbox('id', checkbox_options).add_button('id', 'Text')
 
         return ResponseMessage(
-            user_id=request.user_id,
+            request_user_id=request.request_user_id,
             command_name='help',
             text=request.text,
             photo=None,

@@ -60,33 +60,33 @@ def upgrade():
     op.create_table('msg_user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('ext_id', sa.String(length=100), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('request_user_id', sa.Integer(), nullable=True),
     sa.Column('email', sa.String(length=100), nullable=True),
     sa.Column('username', sa.String(length=100), nullable=True),
     sa.Column('phone', sa.String(length=20), nullable=True),
     sa.Column('messenger_type_id', sa.Integer(), nullable=False),
     sa.Column('dialog_data', sa.JSON(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name='fk_messenger_user_user_id', onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['request_user_id'], ['user.id'], name='fk_messenger_user_user_id', onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('ext_id', 'messenger_type_id', name='_ext_id_messenger_id')
     )
     op.create_table('task',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('request_user_id', sa.Integer(), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('use_date', sa.DateTime(timezone=True), nullable=True),
     sa.Column('parent_task_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['parent_task_id'], ['task.id'], name='fk_parent_id_task_id', onupdate='CASCADE', ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name='fk_messenger_user_user_id', onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['request_user_id'], ['user.id'], name='fk_messenger_user_user_id', onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('dialog',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('msg_user_id', sa.Integer(), nullable=False),
+    sa.Column('request_user_id', sa.Integer(), nullable=False),
     sa.Column('dialog_data', sa.JSON(), nullable=True),
-    sa.ForeignKeyConstraint(['msg_user_id'], ['msg_user.id'], name='fk_user_messenger_msg_user_id', onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['request_user_id'], ['msg_user.id'], name='fk_user_messenger_msg_user_id', onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

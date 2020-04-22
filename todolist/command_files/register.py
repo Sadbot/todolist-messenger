@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from todolist.models import MsgUser
 from todolist.drivers.dto import ResponseMessage, RequestMessage
-from todolist.models.messenger import Dialog
 
 COMMAND_NAME_EN = 'register'
 COMMAND_NAME_RU = 'регистрация'

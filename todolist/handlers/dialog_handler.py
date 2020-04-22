@@ -2,7 +2,7 @@
 Актуальное состояние диалога хранится в БД.
 
 Пример использования:
-    dialog = DialogHandler(user_id=<user_id>, db_session=<db_session>)
+    dialog = DialogHandler(user=<user>, db_session=<db_session>)
 
     # for open new dialog
     dialog.open(command_id=<command_id>)
@@ -26,15 +26,15 @@ from typing import Any, Dict, Union
 from sqlalchemy import null
 from sqlalchemy.orm import Session
 
-from todolist.models.messenger import Dialog
+from todolist.models import MsgUser
 
 
 class DialogHandler(dict):
-    def __init__(self, user_id: int, db_session: Session, logger: logging.Logger = None,
+    def __init__(self, user: MsgUser, db_session: Session, logger: logging.Logger = None,
                  data: Union[Dict[str, Any], str] = None) -> None:
         """
         Args:
-            user_id: идентификатор пользователя.
+            user: модель пользователя.
             db_session: открытая сессия с БД.
             logger: экземпляр логгера.
             data: данные диалога.
@@ -42,28 +42,10 @@ class DialogHandler(dict):
         super().__init__()
 
         self.logger = logger or logging.getLogger('dialog')
-        self.user_id = user_id
         self._session = db_session
-        self._user_info = None
+        self._user = user
 
         self._initialize_data(data)
-
-    @property
-    def _user(self) -> Dialog:
-        """Свойство для получения экземпляра пользователя из БД.
-
-        Returns:
-            Экземпляр объекта пользователя.
-
-        Raises:
-            ValueError если пользователь с указанным идентификатором не найден в БД.
-        """
-        if self._user_info is None:
-            self._user_info = self._session.query(Dialog).filter(Dialog.id == self.user_id).first()
-            if self._user_info is None:
-                raise ValueError(f'User with id {self.user_id} not found in database')
-
-        return self._user_info
 
     def close(self) -> None:
         """Закрывает диалог пользователя. Удаляет данные диалога из БД.
@@ -72,9 +54,9 @@ class DialogHandler(dict):
             RuntimeError если диалог уже закрыт.
         """
         if self._user.dialog_data is None:
-            raise RuntimeError(f'Dialog for user "{self.user_id}" already close.')
+            raise RuntimeError(f'Dialog for user "{self._user.id}" already close.')
 
-        self.logger.info(f'Close dialog for user "{self.user_id}"')
+        self.logger.info(f'Close dialog for user "{self._user.id}"')
         self._save(data=null())
 
     def is_open(self) -> bool:
@@ -92,7 +74,7 @@ class DialogHandler(dict):
             RuntimeError если диалог уже открыт.
         """
         if self._user.dialog_data:
-            raise RuntimeError(f'Dialog for user "{self.user_id}" already open.')
+            raise RuntimeError(f'Dialog for user "{self._user.id}" already open.')
 
         self['command_id'] = command_id
         self._save(data=self.to_json())
@@ -104,9 +86,9 @@ class DialogHandler(dict):
             RuntimeError если диалог не открыт.
         """
         if not self.is_open():
-            raise RuntimeError(f'Dialog for user "{self.user_id}" is not open')
+            raise RuntimeError(f'Dialog for user "{self._user.id}" is not open')
 
-        self.logger.info(f'Update dialog for user "{self.user_id}"')
+        self.logger.info(f'Update dialog for user "{self._user.id}"')
         self._save(data=self.to_json())
 
     def to_json(self) -> str:
@@ -144,7 +126,7 @@ class DialogHandler(dict):
         Args:
             data: данные для сохранения.
         """
-        self.logger.debug(f'Saving dialog data {data} for user "{self.user_id}"')
+        self.logger.debug(f'Saving dialog data {data} for user "{self._user.id}"')
 
         self._user.dialog_data = data
         self._session.merge(self._user)
