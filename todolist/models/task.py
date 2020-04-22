@@ -1,4 +1,5 @@
 import datetime as dt
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, ForeignKey, Text, DateTime
 
@@ -16,7 +17,7 @@ class Task(Base):
         nullable=False
     )
     text = Column(Text, nullable=False)
-    use_date = Column(DateTime(timezone=True), default=dt.datetime.utcnow)
+    use_date: datetime = Column(DateTime(timezone=True), default=dt.datetime.utcnow)
     parent_task_id = Column(
         Integer,
         ForeignKey(

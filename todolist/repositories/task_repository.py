@@ -16,11 +16,21 @@ class TaskRepository(BaseRepository):
         )
         return self.db.execute(statement, {'request_user_id': request_user_id}).fetchall()
 
-    def create_new(self, body: str, user_id: int) -> Task:
+    def save_new(self, body: str, user_id: int) -> Task:
         new_task = Task(
             msg_user_id=user_id,
             text=body,
-            use_date=dt.datetime.utcnow,
+        )
+
+        self.db.add(new_task)
+        self.db.commit()
+
+        return new_task
+
+    def save_new(self, body: str, user_id: int) -> Task:
+        new_task = Task(
+            msg_user_id=user_id,
+            text=body,
         )
 
         self.db.add(new_task)

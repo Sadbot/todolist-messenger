@@ -23,7 +23,7 @@ async def add_todo(*, session: Session, request: RequestMessage, logger: logging
 
     todo_body = request.text.strip()
     text_ret = f'Добавлена задача: {todo_body}'
-    TaskRepository(session).create_new(todo_body, user.id)
+    TaskRepository(session).save_new(todo_body, user.id)
 
     return ResponseMessage(
         user_id=request.user_id,

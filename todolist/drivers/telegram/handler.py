@@ -33,9 +33,10 @@ async def default_handler(message: types.Message, db_session: Session, logger: l
                 markup.add(component.value)
 
     if response.text:
-        await message.reply(response.text,
-                            reply_markup=markup,
-                            parse_mode='Markdown')
+        await message.reply(
+            response.text,
+            reply_markup=markup,
+        )
     elif response.photo:
         await message.reply_photo(response.photo, reply_markup=markup)
 
@@ -47,7 +48,7 @@ def hydrate_request(message: types.Message) -> RequestMessage:
     command_name = None
     text_strip = message.text.strip()
     if text_strip.startswith('/'):
-        command_name, *_ = text_strip.split(maxsplit=1)
+        command_name, text_strip = text_strip.split(maxsplit=1)
         command_name = command_name.strip('/')
 
     return RequestMessage(
